@@ -1,0 +1,5 @@
+Max Velocity: 1.13e-05 m/s
+Avg Viscosity: 2.51e-07 Pa·s
+Max Enthalpy Density: 5.02e+07 J/m³
+Max Coherence: 10.0000sigma
+Max Divergence: 1.33e-04
