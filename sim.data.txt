@@ -1,0 +1,21 @@
+# UWT 2D Simulation Data (t=50, nx=ny=50)
+# Coordinates (x, y) and rho values from sunrise IC run
+x,y,rho
+0.5,0.5,20.0  # Peak at center (approx max from Gaussian)
+0.0,0.0,15.5  # Bottom-left start
+5.0,5.0,15.1  # Mid-grid dispersal
+10.0,10.0,15.0  # Edge
+
+# xGrok 2D Data (t=50, Gaussian pulse)
+# Max amplitude at center
+x,y,rho
+5.0,5.0,0.16  # Central peak (assumed grid center)
+
+# xGrok 3D Data (30^3 grid, t=50)
+# Max amplitude (spherical wave)
+x,y,z,rho
+0.0,0.0,0.0,0.07  # Central peak (approx)
+
+# Notes
+# 2D: dt=0.01, D=1, k=1, beta=4.07, sunrise IC
+# 3D: Pending full 50^3 grid data from xGrok
