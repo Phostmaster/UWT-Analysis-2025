@@ -1,0 +1,5 @@
+converged SCF energy = -438.33715986107
+C-S-H DFT energy: -438.33715986106984 Hartree
+Multiplier: 50.000005, lambda_ep: 3.0, Tc: 297.83688698485236 K
+Final UWT-enhanced lambda_ep: 3.0
+Final Estimated Tc: 297.83688698485236 K with multiplier 50.000005
