@@ -176,17 +176,25 @@ def map_particle_to_grid_indices(position):
     iz = int(np.clip(np.floor((position[2] + L/2) / dx), 0, N - 1))
     return ix, iy, iz
 
-def analyze_black_holes(step, rho, G_eff, R_safe, X, Y, Z, density_threshold, gravitational_parameter_threshold, output_directory, particle_mass, particle_positions=None, seed_data=None):
+def analyze_black_holes(step, rho, G_eff, R_safe, X, Y, Z, density_threshold, gravitational_parameter_threshold, output_directory, particle_mass, particle_velocities=None, seed_data=None):
     black_hole_locations = []
     black_hole_masses = []
     black_hole_gravitational_parameters = []
     rho_flat = rho.ravel()
-    mad = np.median(np.abs(rho_flat - np.median(rho_flat)))
-    adaptive_threshold = np.median(rho_flat) + 3 * mad  # 3 MAD above median
+    rho_median = np.median(rho_flat)
+    rho_mad = np.median(np.abs(rho_flat - rho_median))
+    print(f"Step {step} - rho median: {rho_median}, rho MAD: {rho_mad}")
+    if step > 0:
+        vel_mags = np.linalg.norm(particle_velocities, axis=1)
+        vel_median = np.median(vel_mags)
+        vel_mad = np.median(np.abs(vel_mags - vel_median))
+        print(f"Step {step} - vel median: {vel_median}, vel MAD: {vel_mad}")  # Fixed here
+    adaptive_threshold = np.median(rho_flat) + 0.8 * rho_mad  # Using scale=0.8
     for i in range(N):
         for j in range(N):
             for k in range(N):
                 if rho[i, j, k] > max(density_threshold, adaptive_threshold):
+                    grid_pos = np.array([X[i, j, k], Y[i, j, k], Z[i, j, k]])
                     gravitational_parameter = (G_eff[i, j, k] * particle_mass) / (R_safe[i, j, k] + 1e-10)
                     if gravitational_parameter > gravitational_parameter_threshold:
                         black_hole_locations.append([i, j, k])
@@ -199,6 +207,8 @@ def analyze_black_holes(step, rho, G_eff, R_safe, X, Y, Z, density_threshold, gr
         f.write(f"Step {step} - High-Density Gravitational Parameters: {black_hole_gravitational_parameters}\n")
     print(f"[Step {step}] Black hole log saved to {log_filename}")
     sys.stdout.flush()
+    # ... (rest of the function, e.g., plotting code)
+    # ... (rest of the function, e.g., plotting code)
     slice_index = N // 2
     plt.figure()
     plt.imshow(rho[:, :, slice_index], extent=[-L / 2, L / 2, -L / 2, L / 2], origin='lower', cmap='viridis')
