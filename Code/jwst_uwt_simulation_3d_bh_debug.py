@@ -5,11 +5,11 @@ import time
 import sys
 from scipy.integrate import solve_ivp
 
-# UWT and Physical Parameters (Synced with xGrok)
-g_wave_small = 19.5    # High value for small-scale collapses
-g_wave_large = 0.085   # Low value for large-scale harmony
-phi_1_init = 0.8       # GeV, matching xGrok
-phi_2_init = 0.4       # GeV, matching xGrok
+# UWT and Physical Parameters (Synced with xGrok for 8 BHs)
+g_wave_small = 100.0    # High value per xGrok for max collapses
+g_wave_large = 0.5      # Low value for large-scale harmony
+phi_1_init = 0.8        # GeV
+phi_2_init = 0.4        # GeV
 epsilon_CP = 2.58e-41
 kwave = 2.35e-3
 lambda_d = 1e20
@@ -17,21 +17,21 @@ G = 6.67430e-11
 c = 299792458.0
 v = 0.226
 Lambda = 1e-46
-axion_mass = 1e-22     # eV, xGrok's ultra-light axion mass
+axion_mass = 1e-22      # eV
 
 # Simulation Config
 N = 32                  # Grid size
-L = 3.086e22            # 1 Mpc, matching xGrok
+L = 3.086e22            # 1 Mpc
 dx = L / N
-N_particles = 300       # Increased to 300 per xGrok for more clustering
-particle_mass = 1e30    # Placeholder, to be refined
+N_particles = 300       # Per xGrok
+particle_mass = 1e30    # Placeholder
 dt = 1e10               # Timestep (seconds)
-t_max = 6e12            # Extended to 6e12 s for 600 steps (xGrok advice)
-num_steps = int(t_max / dt)  # ~600 steps
-density_threshold = 1e-33  # Lowered to 1e-33 per xGrok for more BHs
-gravitational_parameter_threshold = 1e4  # Kept as is
-rho_0 = 4.5e-20         # kg/m³, converted from 2.5e-5 GeV/cm³ (xGrok)
-delta_rho = 1e-20       # Increased to 1e-20 per xGrok for stronger perturbations
+t_max = 7e12            # Extended to 7e12 s for 700 steps
+num_steps = int(t_max / dt)  # ~700 steps
+density_threshold = 1e-35  # Lowered per xGrok
+gravitational_parameter_threshold = 1e3
+rho_0 = 4.5e-20         # kg/m³
+delta_rho = 1e-19       # Amplified per xGrok
 output_directory = os.path.join(os.path.expanduser("~"), "Desktop", "Grok")
 os.makedirs(output_directory, exist_ok=True)
 print(f"Output directory set to: {output_directory}")
@@ -49,7 +49,7 @@ def Ez(z):
 def cosmic_time(z):
     z_grid = np.linspace(0, 100, 2000)
     integrand = 1.0 / ((1.0 + z_grid) * Ez(z_grid))
-    return np.trapezoid(integrand, z_grid) / H0
+    return np.trapz(integrand, z_grid) / H0
 
 def time_to_z(t):
     z_grid = np.linspace(0, 100, 2000)
@@ -69,12 +69,13 @@ def D_linear_LCDM(z):
     a_grid = np.linspace(1e-5, a, 4000)
     Ea = np.sqrt(Omega_m / a_grid**3 + Omega_L + Omega_k / a_grid**2)
     integrand = 1.0 / (a_grid**3 * Ea)
-    integral = np.trapezoid(integrand, a_grid)
+    integral = np.trapz(integrand, a_grid)
     D_a = (5.0 * Omega_m / 2.0) * Ea[-1] * integral
     a1 = 1.0
     a_grid1 = np.linspace(1e-5, a1, 4000)
     Ea1 = np.sqrt(Omega_m / a_grid1**3 + Omega_L + Omega_k / a_grid1**2)
-    integral1 = np.trapezoid(1.0 / (a_grid1**3 * Ea1), a_grid1)
+    integrand1 = 1.0 / (a_grid1**3 * Ea1)
+    integral1 = np.trapz(integrand1, a_grid1)
     D_1 = (5.0 * Omega_m / 2.0) * Ea1[-1] * integral1
     return D_a / D_1
 
@@ -179,13 +180,16 @@ def analyze_black_holes(step, rho, G_eff, R_safe, X, Y, Z, density_threshold, gr
     black_hole_locations = []
     black_hole_masses = []
     black_hole_gravitational_parameters = []
+    rho_flat = rho.ravel()
+    mad = np.median(np.abs(rho_flat - np.median(rho_flat)))
+    adaptive_threshold = np.median(rho_flat) + 3 * mad  # 3 MAD above median
     for i in range(N):
         for j in range(N):
             for k in range(N):
-                if rho[i, j, k] > density_threshold:
+                if rho[i, j, k] > max(density_threshold, adaptive_threshold):
                     gravitational_parameter = (G_eff[i, j, k] * particle_mass) / (R_safe[i, j, k] + 1e-10)
                     if gravitational_parameter > gravitational_parameter_threshold:
-                        black_hole_locations.append([i, j, k])  # Log indices instead of arrays
+                        black_hole_locations.append([i, j, k])
                         black_hole_masses.append(rho[i, j, k] * dx ** 3)
                         black_hole_gravitational_parameters.append(gravitational_parameter)
     log_filename = os.path.join(output_directory, f"black_hole_analysis_step_{step}.txt")
@@ -302,13 +306,13 @@ z = np.linspace(-L / 2, L / 2, N, endpoint=False)
 X, Y, Z = np.meshgrid(x, y, z)
 R = np.sqrt(X ** 2 + Y ** 2 + Z ** 2)
 R_safe = np.where(R == 0, 1e-30, R)
-# Enhanced asymmetric perturbations per xGrok
-perturbation += 0.25 * np.cos(X / dx) + 0.2 * np.sin(Y / dx) + 0.15 * np.cos(Z / dx)
+perturbation = 0.2 * np.random.normal(0, 1, (N, N, N))
+perturbation += 0.5 * np.cos(X / dx) + 0.4 * np.sin(Y / dx) + 0.35 * np.cos(Z / dx)
 phi_1 = phi_1_init * (np.cos(kwave * R) * np.exp(-np.abs(R) / lambda_d) + perturbation)
 phi_2 = phi_2_init * (np.sin(kwave * R + epsilon_CP * np.pi) * np.exp(-np.abs(R) / lambda_d) + perturbation)
-rho = rho_0 + delta_rho = 3e-20
+rho = rho_0 + delta_rho * (phi_1 + phi_2)
 phi_mag_squared = phi_1 ** 2 + phi_2 ** 2
-G_eff = G * (1 + g_wave_small * phi_mag_squared)  # Start with small-scale g_wave
+G_eff = G * (1 + g_wave_small * phi_mag_squared)
 
 # Initialize particle positions to sample all seed locations
 seed_indices = seed_collapse_data[:, :3].astype(int)
