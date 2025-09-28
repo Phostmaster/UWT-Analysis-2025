@@ -1,0 +1,3 @@
+Step 300 - High-Density locations (i,j,k): [[16, 16, 16]]
+Step 300 - High-Density Black Hole Masses (kg): [1.7387620071269637e+44]
+Step 300 - High-Density Gravitational Parameters: [1.2140717708138107e+30]
