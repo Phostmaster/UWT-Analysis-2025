@@ -1,13 +1,28 @@
-# UWT Project Overview
+# UWT Analysis 2025 — Validation and Cross-Checks
 
-## Unified Wave Theory (UWT) Progress
-- **Date**: August 27, 2025
-- **Status**: Developing 3D Navier-Stokes (N-S) simulation for ToE integration.
-- **Key Files**:
-  - `3D_velocity_field_partial.npy`: Step 19000 (max vel 0.5962 m/s, div 1.733e+04), uploaded manually.
-  - Awaiting `3D_velocity_field.npy` (target vel 100–500 m/s, div <1e-3) from Xgrok.
-- **Next Steps**: 2D Kerr slice, ΛCDM tests, N-S refinement.
-- **Note**: Files saved to desktop, uploaded to `/UWT_EP_Collab` by hand.
+**Author:** Peter Baldwin  
+**Contact:** [GitHub: Phostmaster](https://github.com/Phostmaster)
 
-## Contact
-- Questions? Reach out to the t
+---
+
+### Purpose
+This repository supports **empirical validation** and **numerical benchmarking** of the *Unified Wave Theory (UWT)*.
+It contains reproducible code, datasets, and plots used in analysis and peer-review documentation.
+
+### Structure
+| Folder | Description |
+|---------|-------------|
+| `Code/` | Python scripts for data analysis and simulation |
+| `Data/` | Public datasets and results used for verification |
+| `ESPRESSO_Validation/` | External software runs and comparison results |
+| `Plots/` | Figures generated during analysis |
+| `Docs/` | Supporting notes and short manuscripts |
+
+### Citation
+Please cite the master repository:
+> Baldwin, P. (2025). *Unified Wave Theory — Analysis and Validation Studies*.  
+> GitHub: [https://github.com/Phostmaster/UWT-Analysis-2025](https://github.com/Phostmaster/UWT-Analysis-2025)
+
+---
+
+See also the main UWT repository: [Phostmaster/Everything](https://github.com/Phostmaster/Everything)
